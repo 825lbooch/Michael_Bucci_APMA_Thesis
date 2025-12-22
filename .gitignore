@@ -1,0 +1,55 @@
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# =============================================================================
+# Project-specific
+# =============================================================================
+
+# Processed data (regenerate with preprocessing scripts)
+data/processed/*.npz
+data/processed/*.npy
+!data/processed/.gitkeep
+
+# Model checkpoints (can be large)
+experiments/*/models/*.pkl
+experiments/**/model_*.pkl
+models_EM*/
+*.pkl
+
+# Keep final results but ignore intermediate
+!experiments/**/model_final.pkl
+
+# Large raw data (use Git LFS)
+# Uncomment if not using LFS:
+# *.mat
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Logs
+*.log
+logs/
+
+# Temporary
+tmp/
+temp/
+*.tmp

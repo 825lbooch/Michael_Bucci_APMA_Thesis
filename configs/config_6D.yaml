@@ -1,0 +1,24 @@
+# 6D Antenna DeepONet Configuration
+# 500 samples, 6 geometry parameters
+
+data:
+  mat_file: data/raw/dataset_wellmatched_raw_local.mat
+  output_dir: data/processed
+
+model:
+  v_dim: 6            # L, W, inset, feedWidth, h, eps_r
+  x_dim: 1            # frequency
+  output_dim: 1       # S11
+  hidden_dim: 64
+  hidden_layers: 3
+
+training:
+  num_epochs: 10001
+  learning_rate: 0.001
+  decay_rate: 0.91
+  decay_steps: 2000
+  scaling: "01"       # [0,1] normalization
+
+experiment:
+  name: exp_6D_full
+  output_dir: experiments/exp_6D_full
