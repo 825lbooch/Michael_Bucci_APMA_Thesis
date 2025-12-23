@@ -51,6 +51,7 @@ with open(os.path.join(MODEL_DIR, 'normalization_stats.pkl'), 'rb') as f:
 
 freq_sweep = np.load(os.path.join(DATA_DIR, 'freq_sweep.npy'))
 freq_GHz = freq_sweep / 1e9
+freq_GHz_jax = jnp.array(freq_GHz)  # JAX version for use in traced functions
 
 print(f"  ✓ Model loaded")
 print(f"  ✓ Frequency range: {freq_GHz[0]:.2f} - {freq_GHz[-1]:.2f} GHz")
@@ -147,9 +148,9 @@ def objective_target_frequency(v_norm, target_freq_GHz, target_s11_dB=-15.0):
         target_s11_dB: Desired S11 level (default -15 dB)
     """
     s11 = forward_model(v_norm)
-    
-    # Find index closest to target frequency
-    freq_idx = jnp.argmin(jnp.abs(freq_GHz - target_freq_GHz))
+
+    # Find index closest to target frequency (use JAX array for traced operations)
+    freq_idx = jnp.argmin(jnp.abs(freq_GHz_jax - target_freq_GHz))
     
     # Primary: minimize S11 at target frequency
     s11_at_target = s11[freq_idx]
@@ -174,9 +175,9 @@ def objective_bandwidth(v_norm, center_freq_GHz, bandwidth_GHz=0.1, threshold_dB
     # Define frequency band
     f_low = center_freq_GHz - bandwidth_GHz / 2
     f_high = center_freq_GHz + bandwidth_GHz / 2
-    
-    # Mask for frequencies in band
-    in_band = (freq_GHz >= f_low) & (freq_GHz <= f_high)
+
+    # Mask for frequencies in band (use JAX array for traced operations)
+    in_band = (freq_GHz_jax >= f_low) & (freq_GHz_jax <= f_high)
     
     # Penalize S11 above threshold in band
     s11_in_band = jnp.where(in_band, s11, -30.0)  # Ignore out-of-band
@@ -194,6 +195,49 @@ def objective_match_curve(v_norm, target_s11):
     """
     s11 = forward_model(v_norm)
     return jnp.mean((s11 - target_s11) ** 2)
+
+def objective_single_band(v_norm, target_freq_GHz, target_s11_dB=-15.0, bandwidth_GHz=0.2):
+    """
+    Objective: Single-band resonance at target frequency
+    
+    This penalizes:
+    1. S11 being above target at the desired frequency
+    2. S11 being too low OUTSIDE the desired band (prevents dual-band)
+    3. Resonance (minimum S11) being far from target frequency
+    
+    Args:
+        v_norm: Normalized geometry (1, 6)
+        target_freq_GHz: Desired resonant frequency
+        target_s11_dB: Desired S11 level at resonance
+        bandwidth_GHz: Width of desired band
+    """
+    s11 = forward_model(v_norm)
+
+    # Find where the minimum actually is (use JAX arrays for traced operations)
+    min_idx = jnp.argmin(s11)
+    actual_res_freq = freq_GHz_jax[min_idx]
+    min_s11 = s11[min_idx]
+
+    # 1. Primary: Want minimum S11 to be at target frequency
+    freq_error = (actual_res_freq - target_freq_GHz) ** 2
+
+    # 2. Want the minimum to be deep (good matching)
+    depth_penalty = jnp.maximum(0, min_s11 - target_s11_dB) ** 2
+
+    # 3. Penalize deep S11 outside the band (prevents dual-resonance)
+    f_low = target_freq_GHz - bandwidth_GHz
+    f_high = target_freq_GHz + bandwidth_GHz
+    out_of_band = (freq_GHz_jax < f_low) | (freq_GHz_jax > f_high)
+    
+    # S11 outside band should be high (close to 0 dB)
+    # Penalize if it goes below -8 dB outside band
+    out_of_band_violation = jnp.where(out_of_band, jnp.maximum(0, -8.0 - s11) ** 2, 0.0)
+    out_of_band_penalty = jnp.mean(out_of_band_violation)
+    
+    # Weighted combination
+    loss = 50.0 * freq_error + 1.0 * depth_penalty + 2.0 * out_of_band_penalty
+    
+    return loss
 
 # =============================================================================
 # Gradient-Based Optimization
@@ -292,20 +336,20 @@ if __name__ == "__main__":
     param_names = ['L_mm', 'W_mm', 'inset_mm', 'feedWidth_mm', 'h_mm', 'eps_r']
     
     # =========================================================================
-    # Example 1: Design antenna resonant at 2.4 GHz (WiFi)
+    # Example 1: Design antenna resonant at 2.4 GHz (WiFi) - SINGLE BAND
     # =========================================================================
     
     print("\n" + "=" * 60)
-    print("Example 1: Design for 2.4 GHz WiFi")
+    print("Example 1: Design for 2.4 GHz WiFi (Single-Band)")
     print("=" * 60)
     
     target_freq = 2.4  # GHz
     
-    # Create objective function
-    obj_fn = lambda v: objective_target_frequency(v, target_freq, target_s11_dB=-15.0)
+    # Use single-band objective to prevent dual-resonance solutions
+    obj_fn = lambda v: objective_single_band(v, target_freq, target_s11_dB=-15.0, bandwidth_GHz=0.2)
     
-    # Optimize
-    v_raw, v_norm, losses = optimize_geometry(obj_fn, n_iterations=500, learning_rate=0.05)
+    # Use multi-start for better global search
+    v_raw, v_norm, best_loss, _ = multi_start_optimization(obj_fn, n_starts=8, n_iterations=400)
     
     # Results
     print(f"\n  Optimized Geometry:")
@@ -322,27 +366,24 @@ if __name__ == "__main__":
     print(f"\n  Performance:")
     print(f"    S11 at {target_freq} GHz: {s11_at_target:.1f} dB")
     print(f"    Minimum S11: {min_s11:.1f} dB at {min_freq:.2f} GHz")
+    print(f"    Frequency error: {abs(min_freq - target_freq)*1000:.0f} MHz")
     
     # Plot
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+    fig, ax = plt.subplots(figsize=(8, 5))
     
-    ax1 = axes[0]
-    ax1.plot(freq_GHz, np.array(s11_optimized), 'b-', linewidth=2)
-    ax1.axvline(x=target_freq, color='r', linestyle='--', label=f'Target: {target_freq} GHz')
-    ax1.axhline(y=-10, color='gray', linestyle=':', label='-10 dB threshold')
-    ax1.set_xlabel('Frequency (GHz)')
-    ax1.set_ylabel('S11 (dB)')
-    ax1.set_title(f'Optimized Design for {target_freq} GHz')
-    ax1.legend()
-    ax1.grid(True, alpha=0.3)
-    ax1.set_ylim([-30, 5])
+    ax.plot(freq_GHz, np.array(s11_optimized), 'b-', linewidth=2)
+    ax.axvline(x=target_freq, color='r', linestyle='--', linewidth=2, label=f'Target: {target_freq} GHz')
+    ax.axhline(y=-10, color='gray', linestyle=':', label='-10 dB threshold')
     
-    ax2 = axes[1]
-    ax2.semilogy(losses)
-    ax2.set_xlabel('Iteration')
-    ax2.set_ylabel('Loss')
-    ax2.set_title('Optimization Convergence')
-    ax2.grid(True, alpha=0.3)
+    # Shade the target band
+    ax.axvspan(target_freq - 0.1, target_freq + 0.1, alpha=0.2, color='green', label='Target band')
+    
+    ax.set_xlabel('Frequency (GHz)', fontsize=12)
+    ax.set_ylabel('S11 (dB)', fontsize=12)
+    ax.set_title(f'Single-Band Design for {target_freq} GHz\nResonance at {min_freq:.2f} GHz, S11 = {min_s11:.1f} dB', fontsize=12)
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    ax.set_ylim([-30, 5])
     
     plt.tight_layout()
     plt.savefig(os.path.join(OUTPUT_DIR, 'inverse_design_2.4GHz.png'), dpi=150)
@@ -350,18 +391,18 @@ if __name__ == "__main__":
     print(f"\n  ✓ Saved: inverse_design_2.4GHz.png")
     
     # =========================================================================
-    # Example 2: Design for 3.0 GHz with better matching
+    # Example 2: Design for 3.0 GHz with better matching (Single-Band)
     # =========================================================================
     
     print("\n" + "=" * 60)
-    print("Example 2: Design for 3.0 GHz (Deep Matching)")
+    print("Example 2: Design for 3.0 GHz (Deep Single-Band Matching)")
     print("=" * 60)
     
     target_freq = 3.0
-    obj_fn = lambda v: objective_target_frequency(v, target_freq, target_s11_dB=-20.0)
+    obj_fn = lambda v: objective_single_band(v, target_freq, target_s11_dB=-20.0, bandwidth_GHz=0.15)
     
     # Use multi-start for better global search
-    v_raw, v_norm, best_loss, _ = multi_start_optimization(obj_fn, n_starts=5, n_iterations=400)
+    v_raw, v_norm, best_loss, _ = multi_start_optimization(obj_fn, n_starts=8, n_iterations=400)
     
     print(f"\n  Optimized Geometry:")
     v_flat = np.array(v_raw).flatten()
@@ -371,32 +412,39 @@ if __name__ == "__main__":
     s11_optimized = forward_model(v_norm)
     min_s11 = np.min(s11_optimized)
     min_freq = freq_GHz[np.argmin(s11_optimized)]
-    print(f"\n  Minimum S11: {min_s11:.1f} dB at {min_freq:.2f} GHz")
+    print(f"\n  Resonance at {min_freq:.2f} GHz, S11 = {min_s11:.1f} dB")
+    print(f"  Frequency error: {abs(min_freq - target_freq)*1000:.0f} MHz")
     
     # =========================================================================
-    # Example 3: Sweep target frequencies
+    # Example 3: Sweep target frequencies (Single-Band)
     # =========================================================================
     
     print("\n" + "=" * 60)
-    print("Example 3: Design Space - Frequency Sweep")
+    print("Example 3: Design Space - Frequency Sweep (Single-Band)")
     print("=" * 60)
     
-    target_freqs = np.linspace(1.8, 3.2, 8)
+    # Focus on frequencies within training data range
+    target_freqs = np.linspace(2.0, 3.0, 6)
     designs = []
     
     for tf in target_freqs:
         print(f"\n  Optimizing for {tf:.1f} GHz...")
-        obj_fn = lambda v, tf=tf: objective_target_frequency(v, tf, target_s11_dB=-10.0)
-        v_raw, v_norm, losses = optimize_geometry(obj_fn, n_iterations=300, learning_rate=0.05)
+        obj_fn = lambda v, tf=tf: objective_single_band(v, tf, target_s11_dB=-10.0, bandwidth_GHz=0.2)
+        
+        # Multi-start for each target
+        v_raw, v_norm, best_loss, _ = multi_start_optimization(obj_fn, n_starts=5, n_iterations=300)
         
         s11 = forward_model(v_norm)
+        min_idx = int(np.argmin(s11))
         designs.append({
             'target_freq': tf,
             'geometry': np.array(v_raw).flatten(),
             's11': np.array(s11),
             'min_s11': float(np.min(s11)),
-            'actual_freq': float(freq_GHz[np.argmin(s11)])
+            'actual_freq': float(freq_GHz[min_idx])
         })
+        
+        print(f"    Target: {tf:.1f} GHz → Achieved: {freq_GHz[min_idx]:.2f} GHz (S11={np.min(s11):.1f} dB)")
     
     # Plot all designs
     fig, axes = plt.subplots(2, 2, figsize=(12, 10))
@@ -465,6 +513,8 @@ if __name__ == "__main__":
     print("=" * 60)
     print(f"\nResults saved to: {OUTPUT_DIR}")
     print("\nKey findings:")
-    print("  - Higher frequencies → smaller L (as expected from λ/2 resonance)")
-    print("  - DeepONet enables instant optimization (vs hours of EM simulation)")
+    print("  - Single-band objective prevents spurious dual-resonance solutions")
+    print("  - Higher frequencies → smaller L (λ/2 resonance physics)")
+    print("  - Best results within training data range (1.5-3.5 GHz)")
+    print("  - DeepONet + JAX autodiff enables instant optimization")
     print("=" * 60)
