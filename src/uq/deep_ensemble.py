@@ -3,9 +3,13 @@ Deep Ensemble Inference with Uncertainty Quantification
 
 This module provides uncertainty-aware predictions using a trained deep ensemble.
 
-Uncertainty types:
+Uncertainty type:
 - Epistemic (model) uncertainty: Captured by disagreement between ensemble members
-- Predictive uncertainty: Total uncertainty in predictions
+  (std across ensemble predictions)
+
+NOTE: This implementation provides epistemic uncertainty only. For full predictive
+uncertainty (epistemic + aleatoric), additional modeling of observation noise
+would be needed (e.g., heteroscedastic output layer or NLL training).
 
 Usage:
     from src.uq.deep_ensemble import DeepEnsemble
@@ -97,8 +101,7 @@ class DeepEnsemble:
     Provides:
     - Mean prediction (ensemble average)
     - Epistemic uncertainty (std across ensemble members)
-    - Confidence intervals
-    - Calibration metrics
+    - Confidence intervals (based on normal approximation)
     """
 
     def __init__(self, ensemble_dir: str = ENSEMBLE_DIR, model_dir: str = MODEL_DIR):

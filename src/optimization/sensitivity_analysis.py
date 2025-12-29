@@ -236,7 +236,7 @@ for p1, p2 in combinations(key_params, 2):
 print("  ✓ Interaction analysis complete")
 
 # =============================================================================
-# 3. Global Sensitivity (Correlation-based with LHS sampling)
+# 3. Global Sensitivity (Correlation-based with uniform random sampling)
 # NOTE: This computes Pearson correlation, not variance-based Sobol indices.
 # Correlation captures linear relationships; for nonlinear sensitivity,
 # consider SALib for true Sobol indices or use Spearman rank correlation.
@@ -247,7 +247,7 @@ print("\n[4] Running Global Sensitivity Analysis (correlation-based)...")
 n_global = 1000
 np.random.seed(42)
 
-# Latin Hypercube Sampling
+# Uniform random sampling across parameter space
 samples = np.zeros((n_global, 6))
 for i in range(6):
     samples[:, i] = v_min[i] + (v_max[i] - v_min[i]) * np.random.rand(n_global)
