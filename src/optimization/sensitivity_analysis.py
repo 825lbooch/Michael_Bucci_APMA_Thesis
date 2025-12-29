@@ -132,16 +132,24 @@ def evaluate_design(geometry):
 def extract_metrics(s11):
     """Extract key performance metrics from S11 curve"""
     min_s11 = np.min(s11)
-    res_freq = freq_GHz[np.argmin(s11)]
-    
-    # Bandwidth (-10 dB)
+    min_idx = np.argmin(s11)
+    res_freq = freq_GHz[min_idx]
+
+    # Bandwidth (-10 dB): find contiguous region around resonance
     below_threshold = s11 < -10
-    if np.any(below_threshold):
-        indices = np.where(below_threshold)[0]
-        bw = freq_GHz[indices[-1]] - freq_GHz[indices[0]]
+    if below_threshold[min_idx]:
+        # Expand left from resonance
+        left = min_idx
+        while left > 0 and below_threshold[left - 1]:
+            left -= 1
+        # Expand right from resonance
+        right = min_idx
+        while right < len(s11) - 1 and below_threshold[right + 1]:
+            right += 1
+        bw = freq_GHz[right] - freq_GHz[left]
     else:
         bw = 0.0
-    
+
     return {
         'min_s11': min_s11,
         'res_freq': res_freq,
@@ -228,10 +236,13 @@ for p1, p2 in combinations(key_params, 2):
 print("  ✓ Interaction analysis complete")
 
 # =============================================================================
-# 3. Global Sensitivity (Sobol-like sampling)
+# 3. Global Sensitivity (Correlation-based with LHS sampling)
+# NOTE: This computes Pearson correlation, not variance-based Sobol indices.
+# Correlation captures linear relationships; for nonlinear sensitivity,
+# consider SALib for true Sobol indices or use Spearman rank correlation.
 # =============================================================================
 
-print("\n[4] Running Global Sensitivity Analysis...")
+print("\n[4] Running Global Sensitivity Analysis (correlation-based)...")
 
 n_global = 1000
 np.random.seed(42)

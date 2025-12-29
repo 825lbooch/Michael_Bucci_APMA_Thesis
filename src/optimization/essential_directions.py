@@ -252,7 +252,12 @@ def find_essential_directions(jacobian, freq_weights=None, threshold=0.90):
     cumulative_contributions = jnp.cumsum(individual_contributions)
 
     # Find N_s: minimum number of directions to reach threshold
-    n_essential = int(jnp.argmax(cumulative_contributions >= threshold)) + 1
+    above_threshold = cumulative_contributions >= threshold
+    if jnp.any(above_threshold):
+        n_essential = int(jnp.argmax(above_threshold)) + 1
+    else:
+        # If threshold not reached, use all directions
+        n_essential = len(S)
 
     return essential_dirs, S, cumulative_contributions, n_essential
 

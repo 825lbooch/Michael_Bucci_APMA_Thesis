@@ -248,10 +248,11 @@ def objective_single_band(v_norm, target_freq_GHz, target_s11_dB=-15.0, bandwidt
     s11 = forward_model(v_norm)
 
     # === SOFT ARGMIN: Differentiable resonance location ===
-    # Convert S11 to "resonance strength" (more negative = stronger)
-    # Use softmax with temperature to create smooth weights
-    temperature = 2.0  # Lower = sharper peak, higher = smoother
-    resonance_strength = -s11 / temperature  # More negative S11 → higher strength
+    # Normalize S11 to [0, 1] range before softmax to ensure good gradient flow
+    # (Raw dB values like -30 to 0 cause vanishing gradients in softmax)
+    s11_normalized = (s11 - jnp.min(s11)) / (jnp.max(s11) - jnp.min(s11) + 1e-6)
+    temperature = 0.1  # Appropriate for [0,1] normalized range
+    resonance_strength = -s11_normalized / temperature  # Lower normalized value = stronger resonance
     weights = jax.nn.softmax(resonance_strength)
 
     # Weighted average frequency = "soft" resonance location

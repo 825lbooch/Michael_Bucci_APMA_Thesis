@@ -112,10 +112,10 @@ def hyper_initial_WB(layers, key):
     W, b = [], []
     for l in range(1, len(layers)):
         in_dim, out_dim = layers[l-1], layers[l]
-        std = np.sqrt(2.0/(in_dim+out_dim))
         key, subkey1, subkey2 = random.split(key, 3)
-        W.append(initializer(subkey1, (in_dim, out_dim), jnp.float32)*std)
-        b.append(initializer(subkey2, (1, out_dim), jnp.float32)*std)
+        # glorot_normal already applies Xavier scaling internally
+        W.append(initializer(subkey1, (in_dim, out_dim), jnp.float32))
+        b.append(jnp.zeros((1, out_dim), dtype=jnp.float32))  # Zero-init biases (standard practice)
     return W, b, key
 
 def hyper_initial_frequencies(layers):
