@@ -77,7 +77,20 @@ v_test, x_test, u_test = data_test["v_test"], data_test["x_test"], data_test["u_
 
 N_full = len(v_train_full)
 n_freq = x_train_full.shape[1]
-freq_GHz = np.linspace(1.5, 3.5, n_freq)
+if x_train_full.ndim == 3:
+    freq_raw = x_train_full[0, :, 0]
+else:
+    freq_raw = x_train_full[0, :]
+
+if np.max(freq_raw) > 1e6:
+    freq_GHz = freq_raw / 1e9
+elif np.max(freq_raw) > 1.0:
+    freq_GHz = freq_raw
+else:
+    raise ValueError(
+        "x_train appears normalized. Provide physical frequency values before "
+        "running baseline vs residual comparison."
+    )
 
 print(f"  Full train: {N_full}, Val: {len(v_val)}, Test: {len(v_test)}")
 

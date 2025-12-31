@@ -93,10 +93,24 @@ print("\n[2] Computing analytical baseline...")
 # We need the ORIGINAL (unnormalized) geometry and frequency values
 # But first, let's check if we have access to the raw values
 
-# The x_train contains normalized frequencies, we need actual GHz values
-# For now, assume frequency range 1.5-3.5 GHz with the number of points in x_train
+# Infer physical frequency grid from the loaded dataset (no hard-coded range)
 n_freq = x_train.shape[1]
-freq_GHz_raw = np.linspace(1.5, 3.5, n_freq)
+if x_train.ndim == 3:
+    freq_raw = x_train[0, :, 0]
+else:
+    freq_raw = x_train[0, :]
+
+if np.max(freq_raw) > 1e6:
+    # x_train is in Hz from preprocessing
+    freq_GHz_raw = freq_raw / 1e9
+elif np.max(freq_raw) > 1.0:
+    # x_train already in GHz
+    freq_GHz_raw = freq_raw
+else:
+    raise ValueError(
+        "x_train appears normalized. Provide physical frequency values before "
+        "running residual training."
+    )
 
 # Store original geometry for analytical computation (before normalization)
 v_train_orig = v_train.copy()
