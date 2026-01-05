@@ -1,0 +1,27 @@
+{
+  "total_samples": 693,
+  "train_samples": 553,
+  "val_samples": 66,
+  "test_samples": 74,
+  "freq_points": 500,
+  "freq_range_GHz": [
+    1.5,
+    3.5
+  ],
+  "bad_samples_removed": 7,
+  "bad_sample_indices": [
+    237,
+    328,
+    378,
+    520,
+    566,
+    597,
+    697
+  ],
+  "matching_quality": {
+    "excellent": 129,
+    "good": 159,
+    "marginal": 339,
+    "poor": 66
+  }
+}
