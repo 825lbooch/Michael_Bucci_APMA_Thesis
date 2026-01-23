@@ -186,9 +186,34 @@ pandas>=1.3.0
 
 ## References
 
+See the [Literature Review](Literature%20Review/) folder for full PDFs.
+
+### DeepONet & Neural Operators
 1. Lu, L., Jin, P., Pang, G., Zhang, Z., & Karniadakis, G. E. (2021). Learning nonlinear operators via DeepONet. *Nature Machine Intelligence*, 3(3), 218-229.
 
 2. Wang, S., Wang, H., & Perdikaris, P. (2021). Learning the solution operator of parametric PDEs with physics-informed DeepONets. *Science Advances*, 7(40).
+
+3. Complex Valued Deep Operator Network (DeepONet) for Three Dimensional Maxwell's Equations. [PDF](Literature%20Review/COMPLEX%20VALUED%20DEEP%20OPERATOR%20NETWORK%20(DEEPONET)%20FOR%20THREE%20DIMENSIONAL%20MAXWELL'S%20EQUATIONS%20[G].pdf)
+
+4. Fourier Neural Operator for Parametric Partial Differential Equations. [PDF](Literature%20Review/fourier_neural_operator_for_pa.pdf)
+
+### Antenna Design & Electromagnetic Surrogate Modeling
+5. Neural Operator Surrogate Solver for Electromagnetic Design (2023). [PDF](Literature%20Review/Neural%20Operator%20Surrogate%20Solver%20for%20Electromagnetic%20Design%202023.pdf)
+
+6. Deep Learning Antenna Design. [PDF](Literature%20Review/Deep%20Learning%20Antenna%20Design.pdf)
+
+7. Deep Learning Convolutional Neural Network Antenna Prediction. [PDF](Literature%20Review/Deep%20Learning%20Convolutional%20Neural%20Network%20Antenna%20Prediction.pdf)
+
+8. Patch Antennas Optimization. [PDF](Literature%20Review/Patch%20Antennas%20Optimization.pdf)
+
+9. Antenna Design Report. [PDF](Literature%20Review/Antenna%20Design%20Report.pdf)
+
+### Inverse Design & Physics Constraints
+10. Inverse Design of Photonic Devices (2022). [PDF](Literature%20Review/Inverse%20Design%20of%20Photonic%20Devices%202022.pdf)
+
+11. Metasurfaces Optimization. [PDF](Literature%20Review/Metasurfaces_Optimization.pdf)
+
+12. Causality and Passivity in Neural Network Surrogate Models. [PDF](Literature%20Review/Causality_and_Passivity_Paper.pdf)
 
 ## License
 
