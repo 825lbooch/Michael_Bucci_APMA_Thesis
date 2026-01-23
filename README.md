@@ -174,8 +174,8 @@ pandas>=1.3.0
 ## Citation
 
 ```bibtex
-@thesis{YOUR_NAME_2025,
-  author  = {Your Name},
+@thesis{bucci2025,
+  author  = {Bucci, Lucas},
   title   = {Fusion DeepONet for Electromagnetic Antenna Surrogate Modeling},
   school  = {Brown University},
   year    = {2025},
