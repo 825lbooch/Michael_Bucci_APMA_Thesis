@@ -6,7 +6,7 @@
 
 > **Honors Thesis**  
 > Brown University — Applied Mathematics & Electrical Engineering  
-> Advisor: Prof. George Karniadakis
+> Advisors: Elham Kianiharchegani and Prof. George Karniadakis
 
 ## Overview
 
@@ -196,5 +196,5 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 ## Acknowledgments
 
-- Prof. George Karniadakis for thesis advising
+- Elham Kianiharchegani and Prof. George Karniadakis for thesis advising
 - Brown University APMA and ECE departments
