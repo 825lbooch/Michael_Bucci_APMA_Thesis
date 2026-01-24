@@ -18,7 +18,7 @@ data/
 │   ├── training_dataset_EM.npz   # <- Largest dataset
 │   ├── validation_dataset_EM.npz
 │   ├── testing_dataset_EM.npz
-│   └── freq_sweep.npy
+│   └── freq_sweep.npy            # 500 points, 1.5-3.5 GHz (4 MHz step)
 │
 ├── processed_complex/            # Complex S11 (real/imag) for physics constraints
 │   ├── training_dataset_complex.npz
@@ -34,11 +34,11 @@ data/
 
 ## Available Datasets
 
-| Dataset | Total Samples | Train | Val | Test | Notes |
-|---------|---------------|-------|-----|------|-------|
-| processed/ | 500 | 400 | 50 | 50 | Original well-matched |
-| processed_700/ | 700 | 560 | 70 | 70 | **Largest dataset** |
-| processed_complex/ | 693 | 553 | 69 | 70 | Complex S11 (Re/Im) |
+| Dataset | Samples | Train | Val | Test | Freq Points | Notes |
+|---------|---------|-------|-----|------|-------------|-------|
+| processed/ | 500 | 400 | 50 | 50 | 201 | Original well-matched |
+| processed_700/ | 700 | 560 | 70 | 70 | 500 | **Largest dataset** |
+| processed_complex/ | 693 | 553 | 69 | 70 | 201 | Complex S11 (Re/Im) |
 
 ## File Formats
 
