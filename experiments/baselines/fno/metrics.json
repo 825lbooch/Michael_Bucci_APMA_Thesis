@@ -1,0 +1,12 @@
+{
+  "test_mse": 0.00479518948122859,
+  "test_l2_rel": 0.06915271282196045,
+  "test_l2_rel_pct": 6.915271282196045,
+  "test_mae_real": 0.02934485301375389,
+  "test_mae_imag": 0.029420156031847,
+  "test_mae_combined": 0.029382506385445595,
+  "test_mae_magnitude": 0.0209965817630291,
+  "test_max_err_magnitude": 0.26796871423721313,
+  "test_mae_db": 0.2778044044971466,
+  "test_max_err_db": 15.888092041015625
+}

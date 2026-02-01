@@ -1,0 +1,29 @@
+{
+  "total_samples": 693,
+  "train_samples": 554,
+  "val_samples": 69,
+  "test_samples": 70,
+  "freq_points": 500,
+  "freq_range_GHz": [
+    1500000000.0,
+    3500000000.0
+  ],
+  "bad_samples_removed": 7,
+  "bad_sample_indices": [
+    237,
+    328,
+    378,
+    520,
+    566,
+    597,
+    697
+  ],
+  "s11_real_range": [
+    -0.9402918388589934,
+    0.9777563126195256
+  ],
+  "s11_imag_range": [
+    -0.9593867633009976,
+    0.9115170626792257
+  ]
+}

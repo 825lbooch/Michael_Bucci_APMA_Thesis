@@ -1,0 +1,60 @@
+======================================================================
+BASELINE MODEL TRAINING
+======================================================================
+
+Loading data...
+  Training samples: 554
+  Validation samples: 69
+  Test samples: 70
+  Frequency points: 500
+  Geometry parameters: 6
+
+======================================================================
+TRAINING FNO
+======================================================================
+FNO parameter count: 1,106,114
+[FNO] Epoch     0 | Train MSE: 1.000682 | Val MSE: 0.995200 | Val L2 Rel: 99.91% | Time: 0.8s
+[FNO] Epoch   500 | Train MSE: 0.039475 | Val MSE: 0.038855 | Val L2 Rel: 19.74% | Time: 269.8s
+[FNO] Epoch  1000 | Train MSE: 0.020363 | Val MSE: 0.020759 | Val L2 Rel: 14.43% | Time: 545.2s
+[FNO] Epoch  1500 | Train MSE: 0.017607 | Val MSE: 0.016677 | Val L2 Rel: 12.93% | Time: 819.4s
+[FNO] Epoch  2000 | Train MSE: 0.011464 | Val MSE: 0.011788 | Val L2 Rel: 10.87% | Time: 1093.6s
+[FNO] Epoch  2500 | Train MSE: 0.008583 | Val MSE: 0.008290 | Val L2 Rel: 9.12% | Time: 1367.0s
+[FNO] Epoch  3000 | Train MSE: 0.008349 | Val MSE: 0.007177 | Val L2 Rel: 8.48% | Time: 1639.7s
+[FNO] Epoch  3500 | Train MSE: 0.007227 | Val MSE: 0.007195 | Val L2 Rel: 8.50% | Time: 1914.1s
+[FNO] Epoch  4000 | Train MSE: 0.007552 | Val MSE: 0.007710 | Val L2 Rel: 8.79% | Time: 2190.9s
+[FNO] Epoch  4500 | Train MSE: 0.006336 | Val MSE: 0.006339 | Val L2 Rel: 7.97% | Time: 2465.2s
+[FNO] Epoch  4999 | Train MSE: 0.005478 | Val MSE: 0.005315 | Val L2 Rel: 7.30% | Time: 2736.6s
+
+FNO Test Results:
+  L2 Relative Error: 6.92%
+  MAE (real): 0.0293
+  MAE (imag): 0.0294
+  MAE (magnitude): 0.0210
+
+======================================================================
+TRAINING U-NET
+======================================================================
+U-Net parameter count: 5,902,658
+[U-Net] Epoch     0 | Train MSE: 0.999832 | Val MSE: 0.991693 | Val L2 Rel: 99.74% | Time: 1.7s
+[U-Net] Epoch   500 | Train MSE: 0.007134 | Val MSE: 0.009328 | Val L2 Rel: 9.67% | Time: 589.7s
+[U-Net] Epoch  1000 | Train MSE: 0.004995 | Val MSE: 0.005783 | Val L2 Rel: 7.62% | Time: 1179.0s
+[U-Net] Epoch  1500 | Train MSE: 0.001931 | Val MSE: 0.004182 | Val L2 Rel: 6.48% | Time: 1761.5s
+[U-Net] Epoch  2000 | Train MSE: 0.001154 | Val MSE: 0.003950 | Val L2 Rel: 6.29% | Time: 2354.2s
+Early stopping at epoch 2179
+
+U-Net Test Results:
+  L2 Relative Error: 6.32%
+  MAE (real): 0.0241
+  MAE (imag): 0.0242
+  MAE (magnitude): 0.0153
+
+======================================================================
+SUMMARY
+======================================================================
+
+Model              Params     L2 Rel %    MAE |S11|     Time (s)
+------------------------------------------------------------
+FNO             1,106,114         6.92       0.0210       2736.6
+UNET            5,902,658         6.32       0.0153       2566.8
+
+Results saved to: /Users/lucasbucci/Dropbox/My Mac (MacBook-Pro.fios-router.home)/Desktop/DeepONet_Repo/experiments/baselines

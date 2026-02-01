@@ -1,161 +1,131 @@
-# Fusion DeepONet for Microstrip Patch Antenna S11 Prediction
+# Fusion DeepONet for Microstrip Patch Antenna Surrogate Modeling
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![JAX](https://img.shields.io/badge/JAX-0.4+-green.svg)](https://github.com/google/jax)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> **Honors Thesis**  
-> Brown University — Applied Mathematics & Electrical Engineering  
+> **Honors Thesis**
+> Brown University — Applied Mathematics & Electrical Engineering
 > Advisors: Elham Kianiharchegani and Prof. George Karniadakis
 
 ## Overview
 
-This repository implements a **Fusion DeepONet** architecture for learning the S11 frequency response of microstrip patch antennas as a function of geometry parameters. The model acts as a surrogate for full-wave electromagnetic simulations.
+This repository implements a **Fusion DeepONet** architecture for learning the complex S11 frequency response of microstrip patch antennas as a function of 6 geometry parameters. The model acts as a surrogate for full-wave electromagnetic simulations, enabling millisecond-scale inference for inverse design and manufacturing yield optimization.
 
-**Problem:** Given antenna geometry → Predict S11(f) across frequency sweep
+**Problem:** Given antenna geometry → Predict complex S11(f) across 500 frequency points
 
-$$S_{11}(\text{dB}) = \mathcal{G}_\theta(L, W, \text{inset}, \text{feedWidth}, h, \varepsilon_r; f)$$
+$$S_{11}(f) = \text{Re}\{S_{11}\} + j\,\text{Im}\{S_{11}\} = \mathcal{G}_\theta(L, W, \text{inset}, \text{feedWidth}, h, \varepsilon_r;\; f)$$
 
 ## Key Results
 
-| Dataset | Samples | Parameters | Test L2 Error | Test MAE |
-|---------|---------|------------|---------------|----------|
-| 2D Baseline | 36 | L, W | ~5% (overfits) | — |
-| **6D Full** | **500** | L, W, inset, feedWidth, h, ε_r | **~1%** | **0.096 dB** |
+### Surrogate Accuracy
 
-### S11 Prediction Accuracy (6D Model)
-![S11 Predictions](results/figures/s11_predictions.png)
+A 30K-parameter Fusion DeepONet trained on 554 antenna simulations from Brown's OSCAR HPC cluster achieves **0.91% L2 relative error** on complex S11 prediction.
 
-### Training Convergence
-| 6D Model (500 samples) | 2D Model (36 samples) |
-|:----------------------:|:---------------------:|
-| ![6D Training](results/figures/training_curves.png) | ![2D Training](results/figures/training_history_2D.png) |
-| Good generalization | Overfitting (expected) |
+### Benchmark Comparison
+
+| Model | Parameters | Test L2 Rel Error | MAE (\|S11\|) |
+|-------|-----------|-------------------|---------------|
+| **Fusion DeepONet** | **29,736** | **0.91%** | — |
+| FNO | 1,106,114 (37x) | 6.92% | 0.0210 |
+| U-Net | 5,902,658 (198x) | 6.32% | 0.0153 |
+
+Fusion DeepONet outperforms both baselines by ~7x in accuracy with 37–198x fewer parameters.
+
+### Robust Inverse Design
+
+Stochastic inverse design under manufacturing tolerances:
+
+| Metric | Standard Design | Robust Design |
+|--------|----------------|---------------|
+| Yield (1% tol.) | 75.9% | 98.9% |
+
+Robustness validated via Hessian curvature analysis and SVD modal decomposition to identify flat design basins resilient to manufacturing noise.
 
 ## Repository Structure
 
 ```
-antenna-deeponet/
+├── benchmarks/                       # Baseline model implementations
+│   ├── fno_model.py                 # Fourier Neural Operator (JAX)
+│   ├── unet_model.py               # 1D U-Net (JAX)
+│   ├── train_baselines.py          # Unified training script
+│   └── data_loader.py              # Shared data loading
 ├── data/
-│   ├── raw/                          # Original data files
-│   │   ├── dataset_wellmatched_raw_local.mat   # 500 samples, 6 params
-│   │   └── antenna_geometries_36.csv           # 36 samples, 2 params
-│   └── processed/                    # Preprocessed tensors (.npz)
+│   ├── raw/                         # Original simulation data
+│   └── processed_complex/           # Complex S11 tensors (.npz)
 ├── src/
 │   ├── models/
-│   │   ├── train_6D.py              # 6-parameter training script
-│   │   └── train_2D.py              # 2-parameter baseline
-│   ├── preprocessing/
-│   │   ├── preprocess_6D.py         # HDF5 .mat → .npz for 6D
-│   │   └── preprocess_2D.py         # CSV → .npz for 2D
-│   ├── optimization/
-│   │   ├── inverse_design.py        # Find geometry for target S11
-│   │   ├── monte_carlo_tolerance.py # Manufacturing yield analysis
-│   │   └── sensitivity_analysis.py  # Parameter sensitivity study
-│   └── utils/
-│       └── visualization.py          # Result plotting
-├── configs/                          # Hyperparameter configs
-├── experiments/                      # Saved models & checkpoints
-├── results/
-│   ├── figures/                      # Training results
-│   ├── inverse_design/               # Optimization results
-│   ├── monte_carlo/                  # Tolerance analysis
-│   └── sensitivity/                  # Sensitivity analysis
-├── requirements.txt
-└── README.md
+│   │   └── train_complex_baseline.py  # Fusion DeepONet training
+│   └── preprocessing/
+│       └── preprocess_6D.py         # HDF5 .mat → .npz
+├── scripts/
+│   ├── run_cmame_benchmarks.py      # Robust design suite (Pareto, SVD, Hessian)
+│   ├── inverse_design.py           # Gradient-based inverse design
+│   └── robust_inverse_design.py    # Yield-aware optimization
+├── experiments/
+│   ├── baselines/                   # FNO & U-Net trained models + metrics
+│   └── exp_complex_baseline/        # Fusion DeepONet checkpoints
+└── results/
+    └── robust_design/               # Yield curves, Pareto fronts, sensitivity
 ```
 
 ## Quick Start
 
-### 1. Setup Environment
+### 1. Setup
 ```bash
-git clone https://github.com/YOUR_USERNAME/antenna-deeponet.git
-cd antenna-deeponet
-
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+git clone https://github.com/825lbooch/Michael_Bucci_APMA_Thesis.git
+cd Michael_Bucci_APMA_Thesis
 pip install -r requirements.txt
 ```
 
-### 2. Run 6D Pipeline (Main Results)
+### 2. Train Fusion DeepONet
 ```bash
-# Preprocess data
-python src/preprocessing/preprocess_6D.py
-
-# Train model (~30 min on CPU, ~5 min on GPU)
-python src/models/train_6D.py
-
-# Visualize results
-python src/utils/visualization.py
+python src/models/train_complex_baseline.py
 ```
 
-### 3. Run 2D Baseline (Quick Test)
+### 3. Train Baselines (FNO & U-Net)
 ```bash
-python src/preprocessing/preprocess_2D.py
-python src/models/train_2D.py
+cd benchmarks
+python train_baselines.py --model both --epochs 5000
 ```
 
-## Optimization & Analysis Tools
-
-Once trained, the surrogate model enables fast design exploration:
-
-### Inverse Design
-Find antenna geometry for a target frequency:
+### 4. Run Robust Inverse Design
 ```bash
-python src/optimization/inverse_design.py
+python scripts/run_cmame_benchmarks.py
 ```
-- Gradient-based optimization using JAX autodiff
-- Multi-start for global search
-- Design for specific resonant frequency or bandwidth
-
-### Monte Carlo Tolerance Analysis
-Predict manufacturing yield:
-```bash
-python src/optimization/monte_carlo_tolerance.py
-```
-- Standard, precision, and low-cost PCB tolerances
-- Yield prediction at different tolerance levels
-- Identify critical parameters for quality control
-
-### Sensitivity Analysis
-Understand parameter effects:
-```bash
-python src/optimization/sensitivity_analysis.py
-```
-- One-at-a-time parameter sweeps
-- Two-parameter interaction plots
-- Global sensitivity rankings
+Runs the full benchmark suite: sigma sweep, Pareto optimization, Hessian sensitivity analysis, and SVD modal decomposition.
 
 ## Method
 
 ### Fusion DeepONet Architecture
 
 ```
-Geometry (L,W,h,...)  ──►  [Branch Network]  ──►  Latent b ∈ ℝ^64
+Geometry (L,W,h,...)  ──►  [Branch Network]  ──►  Latent b ∈ ℝ^p
                                                       │
-                                                      ▼ (fusion)
-Frequency (f)         ──►  [Trunk Network]   ──►  Latent t ∈ ℝ^64
+                                                      ▼ (fusion at each layer)
+Frequency (f)         ──►  [Trunk Network]   ──►  Latent t ∈ ℝ^p
                                                       │
                                                       ▼
-                                               S11 = t · b
+                                               S11 = Re + j·Im
 ```
 
-**Key Features:**
+**Architecture Details:**
 - **Adaptive activation:** `σ(z) = tanh(10az + c) + 10a₁sin(10F₁z + c₁)` with learnable parameters
-- **Skip-connection fusion:** Branch features modulate trunk at each layer
-- **Full-batch training:** Efficient for small-medium datasets
+- **Skip-connection fusion:** Branch features modulate trunk at each layer (not just final dot product)
+- **Complex output:** Two-channel output predicting real and imaginary parts of S11
+- **29,736 trainable parameters** total
 
 ### Antenna Parameters
 
 | Parameter | Symbol | Range | Unit |
 |-----------|--------|-------|------|
-| Patch Length | L | 22 - 48 | mm |
-| Patch Width | W | 29 - 58 | mm |
-| Inset Depth | inset | 8 - 17 | mm |
-| Feed Width | feedWidth | 2 - 9 | mm |
-| Substrate Height | h | 0.8 - 3.0 | mm |
-| Relative Permittivity | ε_r | 2.2 - 3.5 | — |
-| **Frequency** | f | 1.5 - 3.5 | GHz |
+| Patch Length | L | 22 – 48 | mm |
+| Patch Width | W | 29 – 58 | mm |
+| Inset Depth | inset | 8 – 17 | mm |
+| Feed Width | feedWidth | 2 – 9 | mm |
+| Substrate Height | h | 0.8 – 3.0 | mm |
+| Relative Permittivity | ε_r | 2.2 – 3.5 | — |
+| **Frequency** | f | 1.5 – 3.5 | GHz |
 
 ## Dependencies
 
