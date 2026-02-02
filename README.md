@@ -52,6 +52,7 @@ Robustness validated via Hessian curvature analysis and SVD modal decomposition 
 │   └── data_loader.py              # Shared data loading
 ├── data/
 │   ├── raw/                         # Original simulation data
+│   ├── processed_700/               # |S11| dB tensors, 500 freqs (benchmark dataset)
 │   └── processed_complex/           # Complex S11 tensors (.npz)
 ├── src/
 │   ├── models/
@@ -63,7 +64,7 @@ Robustness validated via Hessian curvature analysis and SVD modal decomposition 
 │   ├── inverse_design.py           # Gradient-based inverse design
 │   └── robust_inverse_design.py    # Yield-aware optimization
 ├── experiments/
-│   ├── baselines/                   # FNO & U-Net trained models + metrics
+│   ├── baselines_db/                # FNO & U-Net trained on dB dataset (benchmark)
 │   └── exp_complex_baseline/        # Fusion DeepONet checkpoints
 └── results/
     └── robust_design/               # Yield curves, Pareto fronts, sensitivity
@@ -112,8 +113,8 @@ Frequency (f)         ──►  [Trunk Network]   ──►  Latent t ∈ ℝ^p
 **Architecture Details:**
 - **Adaptive activation:** `σ(z) = tanh(10az + c) + 10a₁sin(10F₁z + c₁)` with learnable parameters
 - **Skip-connection fusion:** Branch features modulate trunk at each layer (not just final dot product)
-- **Complex output:** Two-channel output predicting real and imaginary parts of S11
-- **29,736 trainable parameters** total
+- **Complex output:** Two-channel output predicting real and imaginary parts of S11 (29,736 params) or single-channel |S11| in dB (25,576 params)
+- Benchmark table uses the dB variant (25,576 params)
 
 ### Antenna Parameters
 

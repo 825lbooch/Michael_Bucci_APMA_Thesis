@@ -1,0 +1,31 @@
+{
+  "fno": {
+    "config": {
+      "hidden_dim": 64,
+      "n_modes": 32,
+      "n_layers": 4,
+      "param_count": 1106049
+    },
+    "metrics": {
+      "test_mse": 0.06598424911499023,
+      "test_l2_rel": 0.25376033782958984,
+      "test_l2_rel_pct": 25.376033782958984,
+      "test_mae_db": 0.23071685433387756,
+      "test_max_err_db": 12.161459922790527
+    }
+  },
+  "unet": {
+    "config": {
+      "base_channels": 32,
+      "n_levels": 3,
+      "param_count": 5902625
+    },
+    "metrics": {
+      "test_mse": 0.15042059123516083,
+      "test_l2_rel": 0.38313978910446167,
+      "test_l2_rel_pct": 38.31397891044617,
+      "test_mae_db": 0.29927024245262146,
+      "test_max_err_db": 13.313432693481445
+    }
+  }
+}

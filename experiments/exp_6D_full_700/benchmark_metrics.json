@@ -1,0 +1,19 @@
+{
+  "model": "Fusion DeepONet (dB-only)",
+  "parameters": 25576,
+  "dataset": "data/processed_700",
+  "split": "test (70 samples, 500 freqs)",
+  "normalization": "mean/std standardization from training split",
+  "metrics": {
+    "test_l2_rel": 0.2080,
+    "test_l2_rel_pct": 20.80,
+    "test_mae_db_raw": 0.2286,
+    "test_l2_rel_raw_db": 0.1700
+  },
+  "notes": {
+    "l2_rel": "Computed in standardized space (u - mean) / std, matching baseline normalization",
+    "mae_db_raw": "MAE computed on raw dB values before normalization",
+    "l2_rel_raw_db": "L2 relative error on raw dB values (17.00%)",
+    "how_computed": "Loaded model_final.pkl, ran forward pass on test split from processed_700, applied same mean/std normalization as baselines"
+  }
+}
