@@ -18,19 +18,17 @@ $$S_{11}(f) = \text{Re}\{S_{11}\} + j\,\text{Im}\{S_{11}\} = \mathcal{G}_\theta(
 
 ## Key Results
 
-### Surrogate Accuracy
-
-A 30K-parameter Fusion DeepONet trained on 554 antenna simulations from Brown's OSCAR HPC cluster achieves **0.91% L2 relative error** on complex S11 prediction.
-
 ### Benchmark Comparison
 
-| Model | Parameters | Test L2 Rel Error | MAE (\|S11\|) |
-|-------|-----------|-------------------|---------------|
-| **Fusion DeepONet** | **29,736** | **0.91%** | — |
-| FNO | 1,106,114 (37x) | 6.92% | 0.0210 |
-| U-Net | 5,902,658 (198x) | 6.32% | 0.0153 |
+Apples-to-apples evaluation on 500-frequency |S11| (dB) test split with identical normalization:
 
-Fusion DeepONet outperforms both baselines by ~7x in accuracy with 37–198x fewer parameters.
+| Model | Parameters | Test L2 Rel Error | MAE (dB) |
+|-------|-----------|-------------------|----------|
+| **Fusion DeepONet** | **29,736** | **20.80%** | **0.229** |
+| FNO | 1,106,049 (37x) | 25.38% | 0.231 |
+| U-Net | 5,902,625 (198x) | 38.31% | 0.299 |
+
+Fusion DeepONet outperforms FNO by ~1.2x and U-Net by ~1.8x in L2 error with 37–198x fewer parameters.
 
 ### Robust Inverse Design
 
