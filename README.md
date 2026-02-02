@@ -20,15 +20,17 @@ $$S_{11}(f) = \text{Re}\{S_{11}\} + j\,\text{Im}\{S_{11}\} = \mathcal{G}_\theta(
 
 ### Benchmark Comparison
 
-Apples-to-apples evaluation on 500-frequency |S11| (dB) test split with identical normalization:
+Apples-to-apples evaluation on 500-frequency |S11| (dB) test split. L2 computed in standardized space (mean/std), MAE in raw dB.
 
 | Model | Parameters | Test L2 Rel Error | MAE (dB) |
 |-------|-----------|-------------------|----------|
-| **Fusion DeepONet** | **29,736** | **20.80%** | **0.229** |
-| FNO | 1,106,049 (37x) | 25.38% | 0.231 |
-| U-Net | 5,902,625 (198x) | 38.31% | 0.299 |
+| **Fusion DeepONet** | **25,576** | **20.80%** | **0.229** |
+| FNO | 1,106,049 (43x) | 25.38% | 0.231 |
+| U-Net | 5,902,625 (231x) | 38.31% | 0.299 |
 
-Fusion DeepONet outperforms FNO by ~1.2x and U-Net by ~1.8x in L2 error with 37–198x fewer parameters.
+Dataset: processed_700 (560/70/70 train/val/test, 500 freqs).
+
+Fusion DeepONet outperforms FNO by ~1.2x and U-Net by ~1.8x in L2 error with 43–231x fewer parameters.
 
 ### Robust Inverse Design
 
