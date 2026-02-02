@@ -133,6 +133,15 @@ class CMAMEBenchmark:
         self.u_mean = jnp.array(norm_stats["u_mean"])
         self.u_std = jnp.array(norm_stats["u_std"])
 
+        # Sanity check: freq_ghz and x_min/x_max must be on the same scale
+        freq_order = float(jnp.max(jnp.array(freq_ghz)))
+        stats_order = float(jnp.max(self.x_max_norm))
+        assert abs(np.log10(freq_order + 1e-12) - np.log10(stats_order + 1e-12)) < 2.0, (
+            f"Frequency unit mismatch: freq grid max={freq_order:.4g}, "
+            f"norm stats x_max={stats_order:.4g}. "
+            f"Check if freq_sweep.npy is in Hz but norm stats expect GHz or vice versa."
+        )
+
         # Frequency grid
         self.x_raw = jnp.array(freq_ghz).reshape(1, -1, 1)
         self.x_norm = self._normalize(self.x_raw, self.x_min_norm, self.x_max_norm)
