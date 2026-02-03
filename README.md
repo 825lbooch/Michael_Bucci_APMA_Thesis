@@ -50,22 +50,39 @@ Robustness validated via Hessian curvature analysis and SVD modal decomposition 
 │   ├── unet_model.py               # 1D U-Net (JAX)
 │   ├── train_baselines.py          # Unified training script
 │   └── data_loader.py              # Shared data loading
+├── configs/
+│   └── config_6D.yaml              # DeepONet training configuration
 ├── data/
 │   ├── raw/                         # Original simulation data
 │   ├── processed_700/               # |S11| dB tensors, 500 freqs (benchmark dataset)
-│   └── processed_complex/           # Complex S11 tensors (.npz)
+│   ├── processed_complex/           # Complex S11 tensors (.npz)
+│   └── scripts/
+│       ├── generation/              # Parameter sampling & CSV generation
+│       │   ├── generate_10k_antennas.py
+│       │   ├── antenna_params_1k.csv
+│       │   └── antenna_params_10k.csv
+│       ├── simulation/              # MATLAB MoM simulation scripts
+│       │   ├── oscar_sim_1k.m       # OSCAR HPC batch (1k samples, 500 freqs)
+│       │   ├── oscar_sim_10k.m      # OSCAR HPC batch (10k samples)
+│       │   ├── check_toolbox.m      # MATLAB toolbox diagnostic
+│       │   └── run_antenna_sim_1k.sh # SLURM submission script
+│       └── postprocessing/
+│           └── postprocess_10k.py   # .mat → cleaned .npz pipeline
 ├── src/
 │   ├── models/
-│   │   └── train_complex_baseline.py  # Fusion DeepONet training
+│   │   ├── train_6D.py              # Fusion DeepONet training (dB, 201 freqs)
+│   │   └── train_complex_baseline.py # Fusion DeepONet training (complex, 500 freqs)
+│   ├── optimization/
+│   │   └── inverse_design.py        # Gradient-based inverse design
 │   └── preprocessing/
 │       └── preprocess_6D.py         # HDF5 .mat → .npz
 ├── scripts/
 │   ├── run_cmame_benchmarks.py      # Robust design suite (Pareto, SVD, Hessian)
-│   ├── inverse_design.py           # Gradient-based inverse design
-│   └── robust_inverse_design.py    # Yield-aware optimization
+│   └── robust_inverse_design.py     # Yield-aware optimization
 ├── experiments/
 │   ├── baselines_db/                # FNO & U-Net trained on dB dataset (benchmark)
-│   └── exp_complex_baseline/        # Fusion DeepONet checkpoints
+│   ├── exp_6D_full_700/             # Fusion DeepONet (dB) benchmark metrics
+│   └── exp_complex_baseline/        # Fusion DeepONet (complex) checkpoints
 └── results/
     └── robust_design/               # Yield curves, Pareto fronts, sensitivity
 ```

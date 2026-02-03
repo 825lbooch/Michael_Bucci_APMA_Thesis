@@ -57,7 +57,6 @@ temp/
 # Local-only files (kept on disk, excluded from remote)
 Literature Review/
 configs/config_2D.yaml
-configs/config_6D.yaml
 notebooks/
 references.bib
 src/models/train_2D.py
@@ -76,13 +75,8 @@ data/processed/.gitkeep
 data/raw/antenna_geometries_36.csv
 data/raw/checkpoint_1k.mat
 data/raw/simulation_1k_partial_400.mat
-data/scripts/generation/
-data/scripts/postprocessing/
-data/scripts/simulation/check_toolbox.m
-data/scripts/simulation/oscar_sim_10k.m
-data/scripts/simulation/oscar_sim_1k.m
-data/scripts/simulation/run_antenna_sim_1k.sh
-data/scripts/simulation/run_diagnostic.sh
+data/scripts/generation/antenna_params_1k_with_targets.csv
+data/scripts/generation/antenna_params_10k_with_targets.csv
 results/uq/
 results/essential_directions/
 results/inverse_design_sensitivity/
