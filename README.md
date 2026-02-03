@@ -82,7 +82,8 @@ Robustness validated via Hessian curvature analysis and SVD modal decomposition 
 ├── experiments/
 │   ├── baselines_db/                # FNO & U-Net trained on dB dataset (benchmark)
 │   ├── exp_6D_full_700/             # Fusion DeepONet (dB) benchmark metrics
-│   └── exp_complex_baseline/        # Fusion DeepONet (complex) checkpoints
+│   ├── exp_complex_baseline/        # Fusion DeepONet (complex) checkpoints
+│   └── models_latest/               # Pinned latest checkpoints (see complex_oscar_700/)
 └── results/
     └── robust_design/               # Yield curves, Pareto fronts, sensitivity
 ```
