@@ -61,7 +61,6 @@ configs/config_6D.yaml
 notebooks/
 references.bib
 src/models/train_2D.py
-src/models/train_6D.py
 src/models/train_baseline_280.py
 src/models/train_baseline_700.py
 src/models/train_residual_350.py
