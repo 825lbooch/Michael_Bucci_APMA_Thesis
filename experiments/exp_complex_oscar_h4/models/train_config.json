@@ -1,0 +1,15 @@
+{
+  "model_name": "complex_baseline",
+  "seed_init": 1234,
+  "seed_data": 1234,
+  "num_epochs": 10001,
+  "hidden_layers": 4,
+  "save_every": 250,
+  "batch_size": 0,
+  "learning_rate_init": 0.001,
+  "decay_rate": 0.91,
+  "decay_steps": 2000,
+  "clip_norm": null,
+  "warmup_steps": 0,
+  "warm_start_from": null
+}

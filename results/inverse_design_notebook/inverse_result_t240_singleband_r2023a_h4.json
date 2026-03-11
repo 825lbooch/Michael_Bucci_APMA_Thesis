@@ -1,0 +1,21 @@
+{
+  "tag": "t240_singleband_r2023a_h4",
+  "params_path": "/Users/lucasbucci/Dropbox/My Mac (MacBook-Pro.fios-router.home)/Desktop/DeepONet_Repo/experiments/exp_complex_oscar_h4/models/checkpoints/best/params.pkl",
+  "stats_path": "/Users/lucasbucci/Dropbox/My Mac (MacBook-Pro.fios-router.home)/Desktop/DeepONet_Repo/experiments/exp_complex_oscar_h4/models/normalization_stats.pkl",
+  "freq_path": "/Users/lucasbucci/Dropbox/My Mac (MacBook-Pro.fios-router.home)/Desktop/DeepONet_Repo/data/processed_complex_oscar/freq_sweep.npy",
+  "best_loss": 0.22232727706432343,
+  "pred_min_freq_GHz": 2.409819639278557,
+  "pred_min_s11_dB": -16.2204532623291,
+  "geometry": {
+    "L_mm": 37.090110778808594,
+    "W_mm": 51.613033294677734,
+    "inset_mm": 10.748477935791016,
+    "feedWidth_mm": 5.2765913009643555,
+    "h_mm": 2.310455083847046,
+    "eps_r": 2.2020347118377686
+  },
+  "artifacts": {
+    "curve_csv": "/Users/lucasbucci/Dropbox/My Mac (MacBook-Pro.fios-router.home)/Desktop/DeepONet_Repo/results/inverse_design_notebook/inverse_curve_t240_singleband_r2023a_h4.csv",
+    "curve_png": "/Users/lucasbucci/Dropbox/My Mac (MacBook-Pro.fios-router.home)/Desktop/DeepONet_Repo/results/inverse_design_notebook/inverse_curve_t240_singleband_r2023a_h4.png"
+  }
+}
